@@ -1,5 +1,7 @@
 conda-channel-priority: "strict"
 
-#min_nfeature: 200
-#min_ncount: 500
-#max_mtdna: 5
+seuratObjectDir: seurat_objects
+resultsDir: results
+nDownsampleReplicates: 100
+downsampleRate: 0.8
+workflowSeed: 12345
