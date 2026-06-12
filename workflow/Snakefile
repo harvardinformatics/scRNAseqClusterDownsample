@@ -1,11 +1,13 @@
+SEURAT_OBJECT_DIR = config.get("seuratObjectDir", "seurat_objects")
+RESULTS_DIR = config.get("resultsDir", "results")
 
-SAMPLES = glob_wildcards("seurat_objects/{sample}.rds").sample
+SAMPLES = glob_wildcards(f"{SEURAT_OBJECT_DIR}/{{sample}}.rds").sample
 print(SAMPLES)
 
 rule all:
     input:
-        expand("results/{sample}_clusterdownsampling.tsv", sample=SAMPLES)
-        
+        expand(f"{RESULTS_DIR}/{{sample}}_clusterdownsampling.tsv", sample=SAMPLES)
+
     default_target: True
 
 include: "rules/downsample_clusters.smk"

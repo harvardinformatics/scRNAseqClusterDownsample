@@ -1,0 +1,9 @@
+.snakemake/
+results/
+downdload/
+testdata/results/
+.pytest_cache/
+__pycache__/
+tests/__pycache__/
+*.err
+*.out
