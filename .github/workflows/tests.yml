@@ -1,0 +1,113 @@
+name: Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -el {0}
+
+jobs:
+  default-pytest:
+    name: Default pytest suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up conda test environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: scrnaseq-cluster-downsample-tests
+          environment-file: environment.yml
+          auto-activate-base: false
+          use-mamba: true
+
+      - name: Show tool versions
+        run: |
+          python --version
+          pytest --version
+          snakemake --version
+
+      - name: Run default tests
+        run: pytest tests -q
+
+  snakemake-rule:
+    name: Snakemake rule execution
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up conda test environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: scrnaseq-cluster-downsample-tests
+          environment-file: environment.yml
+          auto-activate-base: false
+          use-mamba: true
+
+      - name: Cache Snakemake conda environments
+        uses: actions/cache@v4
+        with:
+          path: .snakemake/conda
+          key: ${{ runner.os }}-snakemake-conda-${{ hashFiles('workflow/envs/downsample_clusters.yml', 'workflow/envs/downsample_clusters.linux-64.pin.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-snakemake-conda-
+
+      - name: Show tool versions
+        run: |
+          python --version
+          pytest --version
+          snakemake --version
+          conda --version
+
+      - name: Run Snakemake rule test
+        run: pytest tests --run-rule -q
+
+  full-workflow:
+    name: Full Snakemake workflow
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up conda test environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: scrnaseq-cluster-downsample-tests
+          environment-file: environment.yml
+          auto-activate-base: false
+          use-mamba: true
+
+      - name: Cache Snakemake conda environments
+        uses: actions/cache@v4
+        with:
+          path: .snakemake/conda
+          key: ${{ runner.os }}-snakemake-conda-${{ hashFiles('workflow/envs/downsample_clusters.yml', 'workflow/envs/downsample_clusters.linux-64.pin.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-snakemake-conda-
+
+      - name: Show tool versions
+        run: |
+          python --version
+          pytest --version
+          snakemake --version
+          conda --version
+
+      - name: Run full testdata workflow
+        run: pytest tests --run-workflow -q
