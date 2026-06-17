@@ -20,6 +20,10 @@ To execute the full testdata workflow and write outputs under `testdata/results/
 pytest tests --run-workflow -q
 ```
 
+GitHub Actions runs the default suite, the optional rule test, and the full
+workflow test on pull requests. The same workflow can also be started manually
+from the Actions tab with `workflow_dispatch`.
+
 The full-workflow test removes `testdata/results/` before running so that both expected test fixture outputs are regenerated from scratch. It validates each output table and compares it to the reference snapshot under `tests/reference_outputs/testdata/results/`.
 
 By default Snakemake creates rule conda environments under `.snakemake/conda` in the repository root. To use an explicit Snakemake conda prefix:
